@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "prep", "prep\prep.vcxproj", "{F1945015-D663-4783-8670-57A436ED10A5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dataset", "dataset\dataset.vcxproj", "{0480AD11-DB2F-4D27-A88E-BEDEB45D0DB8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "program", "program\program.vcxproj", "{DBD0F7E8-0D19-44D3-8947-9DB518C60C05}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1945015-D663-4783-8670-57A436ED10A5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F1945015-D663-4783-8670-57A436ED10A5}.Debug|Win32.Build.0 = Debug|Win32
+		{F1945015-D663-4783-8670-57A436ED10A5}.Release|Win32.ActiveCfg = Release|Win32
+		{F1945015-D663-4783-8670-57A436ED10A5}.Release|Win32.Build.0 = Release|Win32
+		{0480AD11-DB2F-4D27-A88E-BEDEB45D0DB8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0480AD11-DB2F-4D27-A88E-BEDEB45D0DB8}.Debug|Win32.Build.0 = Debug|Win32
+		{0480AD11-DB2F-4D27-A88E-BEDEB45D0DB8}.Release|Win32.ActiveCfg = Release|Win32
+		{0480AD11-DB2F-4D27-A88E-BEDEB45D0DB8}.Release|Win32.Build.0 = Release|Win32
+		{DBD0F7E8-0D19-44D3-8947-9DB518C60C05}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DBD0F7E8-0D19-44D3-8947-9DB518C60C05}.Debug|Win32.Build.0 = Debug|Win32
+		{DBD0F7E8-0D19-44D3-8947-9DB518C60C05}.Release|Win32.ActiveCfg = Release|Win32
+		{DBD0F7E8-0D19-44D3-8947-9DB518C60C05}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {361F8F81-DA86-49D4-8FAF-81E59B06FA93}
+	EndGlobalSection
+EndGlobal
