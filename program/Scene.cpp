@@ -7,7 +7,7 @@
 Scene::Scene()
 //	: mVolume(vec3i(256,256,256), "../debug/kula256.raw", "../debug/kula256.raw.grad","../debug/vol.raw",vec3i(256,256,256)),
 //	: mVolume(vec3i(128,128,128), "../debug/kula.raw", "../debug/kula.raw.grad","../debug/vol.raw",vec3i(128,128,128)),
-	: mVolume(vec3i(128,128,128), "../debug/kula128.raw", "../debug/kula128.raw.grad","../debug/vol.raw",vec3i(128,128,128)),
+	: mVolume(vec3i(128,128,128), "kula128.raw", "kula128.raw.grad","vol.raw",vec3i(128,128,128)),
 //	: mVolume(vec3i(256,256,256), "../debug/foot.raw.modi", "../debug/foot.raw.grad","../debug/vol.raw",vec3i(128,128,128)),
 //	: mVolume(vec3i(256,256,256), "../debug/skull.raw.modi", "../debug/skull.raw.grad","../debug/vol.raw",vec3i(128,128,128)),
 //	: mVolume(vec3i(256,256,256), "../debug/volume.raw.modi", "../debug/volume.raw.grad","../debug/vol.raw",vec3i(128,128,128)),
@@ -25,7 +25,7 @@ Scene::Scene()
 	  tf_data(256*4+44)
 {
 //read 2D texture file
-	std::ifstream ts("../debug/t.bmp", std::ios::in | std::ios::binary);
+	std::ifstream ts("t.bmp", std::ios::in | std::ios::binary);
 	if (!ts.is_open())
 		throw std::runtime_error("could not open ");
 	if( ts.bad() ) std::cerr << "Error reading data" << std::endl;
