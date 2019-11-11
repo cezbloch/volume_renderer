@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+/.vs/msc_project/v15
+/dataset/Debug
+/prep/Debug
+/program/Debug
