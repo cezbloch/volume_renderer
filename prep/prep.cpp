@@ -44,26 +44,26 @@ real_intype *r_indata;
 real_outtype *r_outdata;
 down_intype *down_in;
 down_outtype *down_out;
-vec3i size,mini_size,nr_mini_voxels;
+vec3i volume_size,mini_size,nr_mini_voxels;
 
-//unsigned char read_data(int x,int y,int z){return raw_data[x+y*size.x+z*(size.x*size.y)];}
-//unsigned char read_data(int x,int y,int z){return raw_data[x+y*size.x+z*(size.x*size.y)];}
+//unsigned char read_data(int x,int y,int z){return raw_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)];}
+//unsigned char read_data(int x,int y,int z){return raw_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)];}
 unsigned char read_data_x(int x,int y,int z)
-{return raw_data[x+y*size.x+z*(size.x*size.y)].x;}
+{return raw_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].x;}
 
 real_intype read_real_data(int x,int y,int z)
-{return r_indata[x+y*size.x+z*(size.x*size.y)];}
+{return r_indata[x+y*volume_size.x+z*(volume_size.x*volume_size.y)];}
 
 unsigned char read_data(int x,int y,int z)
-{return in_data[x+y*size.x+z*(size.x*size.y)];}
+{return in_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)];}
 
 void write_data(int x,int y,int z,out_type tmp)
-{all_data[x+y*size.x+z*(size.x*size.y)]=tmp;}
+{all_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=tmp;}
 
 void write_mini_data(int x,int y,int z,mini_type tmp)
 {mini_data[x+y*mini_size.x+z*(mini_size.x*mini_size.y)]=tmp;}
 
-bmp_header set_up_header(vec3i size);
+bmp_header set_up_header(vec3i volume_size);
 
 int main(int argc,char* argv[])
 {
@@ -78,9 +78,9 @@ if (argc<3){cout<<"program usage: prep[1] filename[2] mode[3] scale[4](opt)"<<en
 <<"p - marges 2d images into one 3d texture.Pictures MUST be numbered from 1.bmp to z.bmp"<<endl
 <<"z - save one slice in file , slice number specified by 4th parameter"<<endl
 <<"d - downsample from 16 bits to 8 bits, later need more preprocessing i.e. gradient creation"<<endl
-<<"s - stretch 3d volume along z direction to match size.x direction (make it cubic)"<<endl<<endl
+<<"s - stretch 3d volume along z direction to match volume_size.x direction (make it cubic)"<<endl<<endl
 <<"example : prep volume.raw r 3"<<endl
-<<"REMEMBER - you need to create file filename.size with the x,y,z sizes of the volume"<<endl;exit(1);}
+<<"REMEMBER - you need to create file filename.volume_size with the x,y,z sizes of the volume"<<endl;exit(1);}
 int z,x,y,i,j,k;
 int length,coef;//coefficent to change char to short int
 int zero_val;//the value of zero in shader 32768/2
@@ -95,25 +95,25 @@ mode=argv[2][0];
 scale=atoi(argv[3]);
 in_name=argv[1];
 
-size_name=in_name+".size";
-ifstream sizes(size_name.c_str(),ios::in);	//and open file name.size with dimensions
-sizes>>size.x>>size.y>>size.z;	//read sizes in
-cout<<size.x<<" "<<size.y<<" "<<size.z<<" "<<size_name<<endl;
-length=size.x*size.y*size.z;
+size_name=in_name+".volume_size";
+ifstream sizes(size_name.c_str(),ios::in);	//and open file name.volume_size with dimensions
+sizes>>volume_size.x>>volume_size.y>>volume_size.z;	//read sizes in
+cout<<volume_size.x<<" "<<volume_size.y<<" "<<volume_size.z<<" "<<size_name<<endl;
+length=volume_size.x*volume_size.y*volume_size.z;
 
 int nr_balls=scale;
-int max_dst=min(size.x/2,size.y/2);
-max_dst=min(max_dst,size.z/2);
+int max_dst=min(volume_size.x/2,volume_size.y/2);
+max_dst=min(max_dst,volume_size.z/2);
 
 vec3i diff,curr,center;
-center.x=size.x/2-1;
-center.y=size.y/2-1;
-center.z=size.z/2-1;
+center.x=volume_size.x/2-1;
+center.y=volume_size.y/2-1;
+center.z=volume_size.z/2-1;
 
 
 if(mode=='z')
 {
-	int pic_length=size.x*size.y;
+	int pic_length=volume_size.x*volume_size.y;
 	unsigned short type=19778;
 	string out_name;
 	stringstream number;
@@ -124,7 +124,7 @@ if(mode=='z')
 	raw_in=new unsigned char[length];
 	pic=new unsigned char[3*pic_length];
 
-	header=set_up_header(size);
+	header=set_up_header(volume_size);
 
 	ifstream input(in_name.c_str(), ios::in | ios::binary);
 	input.read ((char*)raw_in,length);
@@ -133,7 +133,7 @@ if(mode=='z')
 	//out_name="pictures/"+number.str()+in_name+".bmp";
 	//output(out_name.c_str(), ios::out | ios::binary);
 
-	for(j=0;j<size.z;j++)
+	for(j=0;j<volume_size.z;j++)
 	{
 		stringstream number;
 		number.flush();
@@ -150,7 +150,7 @@ if(mode=='z')
 
 		//cout<<"writing to disc"<<endl;
 		//!!!!!!!!! sooo stupid , structure or class can be only power of 2
-		//it can't have size 54 , only 52 or 56 !!!! 
+		//it can't have volume_size 54 , only 52 or 56 !!!! 
 		output.write((char*)&type,sizeof(unsigned short));
 		output.write((char*)&header,sizeof(bmp_header));
 		//cout<<sizeof(bmp_header)<<endl;
@@ -189,8 +189,8 @@ if(mode=='s')
 	unsigned char *out_data,*tmp_data;
 	string out_name;
 
-	out_length=size.x*size.y*size.x;
-	pic_length=size.x*size.y;
+	out_length=volume_size.x*volume_size.y*volume_size.x;
+	pic_length=volume_size.x*volume_size.y;
 	out_data=new unsigned char[out_length];
 	tmp_data=new unsigned char[length];
 	ifstream input(in_name.c_str(), ios::in | ios::binary);
@@ -198,15 +198,15 @@ if(mode=='s')
 	out_name="new_"+in_name;
 	ofstream output(out_name.c_str(), ios::out | ios::binary);
 
-	ratio=(float)size.z/(float)size.x;
-	for(i=0;i<size.x;i++)
+	ratio=(float)volume_size.z/(float)volume_size.x;
+	for(i=0;i<volume_size.x;i++)
 	{
 	e=i*ratio;
 	f=floor(e);
 	c=ceil(e);
 	w1=1-(e-f);
 	w2=1-w1;
-	if(c==size.z)c=f;
+	if(c==volume_size.z)c=f;
 	for(j=0;j<pic_length;j++)
 		{
 		out_data[i*pic_length+j]=unsigned char(w1*(float)tmp_data[(int)f*pic_length+j]+w2*(float)tmp_data[(int)c*pic_length+j]);
@@ -214,7 +214,7 @@ if(mode=='s')
 	}
 
 	cout<<"writing to disc"<<endl;
-	output.write((char*)&out_data[0],sizeof(unsigned char)*pic_length*size.x);
+	output.write((char*)&out_data[0],sizeof(unsigned char)*pic_length*volume_size.x);
 	output.close();
 }
 
@@ -225,13 +225,13 @@ if(mode=='p')
 	unsigned char *out_data,*tmp_data,*buffer;
 	string pic_name;
 
-	pic_length=size.x*size.y;
-	out_data=new unsigned char[pic_length*size.x];
+	pic_length=volume_size.x*volume_size.y;
+	out_data=new unsigned char[pic_length*volume_size.x];
 	tmp_data=new unsigned char[length];
 	buffer=new unsigned char[pic_length*3];
 	ofstream output(in_name.c_str(), ios::out | ios::binary);
 
-	for(i=1;i<=size.z;i++)
+	for(i=1;i<=volume_size.z;i++)
 	{
 	stringstream ss;
 	ss << i << ".bmp";
@@ -240,20 +240,20 @@ if(mode=='p')
 	ifstream input(pic_name.c_str(), ios::in | ios::binary);
 	//input.seekg(0,54);
 	input.seekg(54, ios::beg);
-	input.read ((char*)buffer,size.x*size.y*3);
+	input.read ((char*)buffer,volume_size.x*volume_size.y*3);
 	for(j=0;j<pic_length;j++)
 		tmp_data[(i-1)*pic_length+j]=buffer[3*j];
 	input.close();
 	}
-	ratio=(float)size.z/(float)size.x;
-	for(i=0;i<size.x;i++)
+	ratio=(float)volume_size.z/(float)volume_size.x;
+	for(i=0;i<volume_size.x;i++)
 	{
 	e=i*ratio;
 	f=floor(e);
 	c=ceil(e);
 	w1=1-(e-f);
 	w2=1-w1;
-	if(c==size.z)c=f;
+	if(c==volume_size.z)c=f;
 	for(j=0;j<pic_length;j++)
 		{
 		out_data[i*pic_length+j]=unsigned char(w1*(float)tmp_data[(int)f*pic_length+j]+w2*(float)tmp_data[(int)c*pic_length+j]);
@@ -261,7 +261,7 @@ if(mode=='p')
 	}
 
 	cout<<"writing to disc"<<endl;
-	output.write((char*)&out_data[0],sizeof(unsigned char)*pic_length*size.x);
+	output.write((char*)&out_data[0],sizeof(unsigned char)*pic_length*volume_size.x);
 	output.close();
 }
 //calculate 
@@ -275,15 +275,15 @@ if(mode=='a')
 	luminance.read((char*)(&in_data[0]),length*sizeof(unsigned char));
 
 	out_name="smooth_"+in_name;
-	ofstream output(out_name.c_str(), ios::out | ios::binary);	//stream for output file  name.size.my
+	ofstream output(out_name.c_str(), ios::out | ios::binary);	//stream for output file  name.volume_size.my
 	out_data=new unsigned char[length];
-	for(z=0;z<size.z;z++)
+	for(z=0;z<volume_size.z;z++)
 	{
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
-				if(x==0||x==size.x-1||y==0||y==size.y-1||z==0||z==size.z-1)
-					out_data[x+y*size.x+z*(size.x*size.y)]=read_data(x,y,z);
+				if(x==0||x==volume_size.x-1||y==0||y==volume_size.y-1||z==0||z==volume_size.z-1)
+					out_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=read_data(x,y,z);
 				else
 					{
 					tmp=float(
@@ -295,7 +295,7 @@ if(mode=='a')
 					read_data(x,y,z-1)+
 					read_data(x,y,z+1));
 					tmp=tmp/7;
-					out_data[x+y*size.x+z*(size.x*size.y)]=unsigned char(tmp);
+					out_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=unsigned char(tmp);
 					}
 				}
 	}
@@ -309,7 +309,7 @@ if(mode=='g')
 	ifstream luminance(in_name.c_str(),ios::in|ios::binary);	//stream for input file
 
 	grad_name=in_name+".grad";
-	ofstream output(grad_name.c_str(), ios::out | ios::binary);	//stream for output file  name.size.my
+	ofstream output(grad_name.c_str(), ios::out | ios::binary);	//stream for output file  name.volume_size.my
 
 	vec3 tmp_max=vec3(0,0,0),tmp_min=vec3(0,0,0);
 	out_type tmp;
@@ -321,17 +321,17 @@ if(mode=='g')
 	all_data=new out_type[length];
 
 	luminance.read((char*)(&raw_data[0]),unsigned(length*sizeof(in_type)));
-	for(z=0;z<size.z;z++)
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+	for(z=0;z<volume_size.z;z++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
-						if(x==0||x==size.x-1)					
+						if(x==0||x==volume_size.x-1)					
 							tmp.x=zero_val;
 						else tmp.x=zero_val+coef*(read_data_x(x+1,y,z)-read_data_x(x-1,y,z));
-						if(y==0||y==size.y-1)					
+						if(y==0||y==volume_size.y-1)					
 							tmp.y=zero_val;
 						else tmp.y=zero_val+coef*(read_data_x(x,y+1,z)-read_data_x(x,y-1,z));
-						if(z==0||z==size.z-1)					
+						if(z==0||z==volume_size.z-1)					
 							tmp.z=zero_val;
 						else tmp.z=zero_val+coef*(read_data_x(x,y,z+1)-read_data_x(x,y,z-1));
 						if(tmp.x>tmp_max.x)tmp_max.x=tmp.x;
@@ -355,9 +355,9 @@ if(mode=='r')
 {
 	ifstream luminance(in_name.c_str(),ios::in|ios::binary);	//stream for input file
 	grad_name=in_name+".grad";
-	ofstream output(grad_name.c_str(), ios::out | ios::binary);	//stream for output file  name.size.my
+	ofstream output(grad_name.c_str(), ios::out | ios::binary);	//stream for output file  name.volume_size.my
 	modi_name=in_name+".modi";
-	ofstream modified(modi_name.c_str(), ios::out | ios::binary);	//stream for output file  name.size.my
+	ofstream modified(modi_name.c_str(), ios::out | ios::binary);	//stream for output file  name.volume_size.my
 
 	vec3 tmp_max=vec3(0,0,0),tmp_min=vec3(0,0,0);
 	out_type tmp;
@@ -372,17 +372,17 @@ if(mode=='r')
 	cout<<"preprocessing dataset - creating gradients"<<endl;
 
 	luminance.read((char*)(&r_indata[0]),unsigned(length*sizeof(real_intype)));
-	for(z=0;z<size.z;z++)
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+	for(z=0;z<volume_size.z;z++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
-						if(x==0||x==size.x-1)					
+						if(x==0||x==volume_size.x-1)					
 							tmp.x=zero_val;
 						else tmp.x=zero_val+coef*(read_real_data(x+1,y,z)-read_real_data(x-1,y,z));
-						if(y==0||y==size.y-1)					
+						if(y==0||y==volume_size.y-1)					
 							tmp.y=zero_val;
 						else tmp.y=zero_val+coef*(read_real_data(x,y+1,z)-read_real_data(x,y-1,z));
-						if(z==0||z==size.z-1)					
+						if(z==0||z==volume_size.z-1)					
 							tmp.z=zero_val;
 						else tmp.z=zero_val+coef*(read_real_data(x,y,z+1)-read_real_data(x,y,z-1));
 						if(tmp.x>tmp_max.x)tmp_max.x=tmp.x;
@@ -401,21 +401,21 @@ if(mode=='r')
 		cout<<"done"<<endl;
 
 	cout<<"rewriting original data and adding new 2Dims artificial data (spheres - green and blue component)"<<endl;
-	for(z=0;z<size.z;z++)
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+	for(z=0;z<volume_size.z;z++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
-				r_outdata[x+y*size.x+z*(size.x*size.y)].x=read_real_data(x,y,z);
-				r_outdata[x+y*size.x+z*(size.x*size.y)].z=0;
+				r_outdata[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].x=read_real_data(x,y,z);
+				r_outdata[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].z=0;
 				curr=vec3i(x,y,z);
 				diff=curr-center;
 				distance=sqrt(pow(float(diff.x),2)+pow(float(diff.y),2)+pow(float(diff.z),2));
 				if(distance<max_dst)
-					r_outdata[x+y*size.x+z*(size.x*size.y)].y=unsigned char(255-255*distance/max_dst);
+					r_outdata[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].y=unsigned char(255-255*distance/max_dst);
 				else
-					r_outdata[x+y*size.x+z*(size.x*size.y)].y=0;
+					r_outdata[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].y=0;
 				}
-	vec3i mini_size(size.x/nr_balls,size.y/nr_balls,size.z/nr_balls);
+	vec3i mini_size(volume_size.x/nr_balls,volume_size.y/nr_balls,volume_size.z/nr_balls);
 	max_dst/=nr_balls;
 	for(k=0;k<nr_balls;k++)
 		for(j=0;j<nr_balls;j++)
@@ -433,7 +433,7 @@ if(mode=='r')
 						distance=sqrt(pow(float(diff.x),2)+pow(float(diff.y),2)+pow(float(diff.z),2));
 						if(distance<max_dst)
 						{
-							r_outdata[x+y*size.x+z*(size.x*size.y)].z=unsigned char(255-255*distance/max_dst);
+							r_outdata[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].z=unsigned char(255-255*distance/max_dst);
 						}
 					}
 
@@ -448,7 +448,7 @@ if(mode=='m')
 {
 	ifstream luminance(in_name.c_str(),ios::in|ios::binary);	//stream for input file
 	grad_name=in_name+".mini";
-	ofstream output(grad_name.c_str(), ios::out | ios::binary);	//stream for output file  name.size.my
+	ofstream output(grad_name.c_str(), ios::out | ios::binary);	//stream for output file  name.volume_size.my
 
 
 	vec3 tmp_max=vec3(0,0,0),tmp_min=vec3(0,0,0);
@@ -456,7 +456,7 @@ if(mode=='m')
 	int mini_length,max,min;
 	unsigned long sum;
 	
-	mini_size=size/scale;
+	mini_size=volume_size/scale;
 	mini_length=mini_size.x*mini_size.y*mini_size.z;
 	raw_data =new in_type[length];
 	mini_data=new mini_type[mini_length];
@@ -491,19 +491,19 @@ if(mode=='m')
 
 }
 
-bmp_header set_up_header(vec3i size)
+bmp_header set_up_header(vec3i volume_size)
 {
 bmp_header tmp;
 
 //tmp.bfType = 19778;
-tmp.bfSize = 54+3*size.x*size.y;
+tmp.bfSize = 54+3*volume_size.x*volume_size.y;
 tmp.bfReserved1 = 0;
 tmp.bfReserved2 = 0;
 tmp.bfOffBits = 54;
 
 tmp.biSize = 40;
-tmp.biWidth = size.x;
-tmp.biHeight = size.y;
+tmp.biWidth = volume_size.x;
+tmp.biHeight = volume_size.y;
 tmp.biPlanes = 1;
 tmp.biBitCount = 24;
 tmp.biCompression = 0;

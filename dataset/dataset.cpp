@@ -14,7 +14,7 @@ class tex_type
 {
 public:
 vec3usi gradients;
-unsigned short int size;
+unsigned short int volume_size;
 };
 
 class grad_float
@@ -30,21 +30,21 @@ vec3c *multi_data;
 vec3si *gradients;
 tex_type *bubble_data;
 bool *mask_data;
-vec3i size;
+vec3i volume_size;
 int max_val,coef,zero_val,max_bubble_size;
 
 
 void write_data(int x,int y,int z,grad_float tmp)
-{all_data[x+y*size.x+z*(size.x*size.y)]=tmp;}
+{all_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=tmp;}
 
 void write_char_data(int x,int y,int z,unsigned char tmp)
-{sphere_data[x+y*size.x+z*(size.x*size.y)]=tmp;}
+{sphere_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=tmp;}
 
 void write_multi_data(int x,int y,int z,vec3c tmp)
-{multi_data[x+y*size.x+z*(size.x*size.y)]=tmp;}
+{multi_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=tmp;}
 
 void write_grad_data(int x,int y,int z,vec3si tmp)
-{gradients[x+y*size.x+z*(size.x*size.y)]=tmp;}
+{gradients[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=tmp;}
 
 int rand_int(int max)
 {return (int)((float)(max*rand())/(float)RAND_MAX);}
@@ -56,7 +56,7 @@ int x,y,z;
 for(z=center.z-radius;z<center.z+radius;z++)
 	for(y=center.y-radius;y<center.y+radius;y++)
 		for(x=center.x-radius;x<center.x+radius;x++)
-			if(mask_data[x+y*size.x+z*(size.x*size.y)]==true)return true;
+			if(mask_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]==true)return true;
 return false;
 }
 
@@ -81,11 +81,11 @@ for(z=center.z-radius;z<center.z+radius;z++)
 					grad.y=unsigned short int(zero_val+zero_val*diff.y/distance);
 					grad.z=unsigned short int(zero_val+zero_val*diff.z/distance);
 				}
-				mask_data[x+y*size.x+z*(size.x*size.y)]=true;
-				bubble_data[x+y*size.x+z*(size.x*size.y)].size=unsigned short int(max_val*distance/(float)max_bubble_size);
-				//bubble_data[x+y*size.x+z*(size.x*size.y)].size=zero_val;
+				mask_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)]=true;
+				bubble_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].volume_size=unsigned short int(max_val*distance/(float)max_bubble_size);
+				//bubble_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].volume_size=zero_val;
 				//cout<<unsigned short int(max_val*distance/(float)max_bubble_size)<<endl;
-				bubble_data[x+y*size.x+z*(size.x*size.y)].gradients=grad;
+				bubble_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].gradients=grad;
 			}			
 		}
 }
@@ -103,9 +103,9 @@ if (argc<4){cout<<"program usage: dataset[1] outname[2] sizes[3] mode[4] multi_d
 <<"if using mode 'm' then additional parameter is needed,that tell now many spheres with extra parameter will "
 <<"be create on each axis! nr_spheres^3 "<<endl;exit(1);}
 
-size.x=atoi(argv[2]);
-size.y=atoi(argv[2]);
-size.z=atoi(argv[2]);
+volume_size.x=atoi(argv[2]);
+volume_size.y=atoi(argv[2]);
+volume_size.z=atoi(argv[2]);
 int nr_balls=0;
 char mode;
 mode=argv[3][0];
@@ -115,22 +115,22 @@ cout<<"nr balls:"<<nr_balls<<endl;
 int z,x,y;
 int i,j,k;
 long int written=0;
-//maximum distance depending on volume size and written in proper format
+//maximum distance depending on volume volume_size and written in proper format
 //divide by 4 cause of 4 components in grad_float, and by 2 cause we consider distance from center
-int length,max_dst=size.x/2-1;
+int length,max_dst=volume_size.x/2-1;
 //int max_val=pow(255.0f,2)/2-1;
 double distance;
 string name,grad_name;
-length=size.x*size.y*size.z;
-cout<<size.x<<" "<<size.y<<" "<<size.z<<endl;
+length=volume_size.x*volume_size.y*volume_size.z;
+cout<<volume_size.x<<" "<<volume_size.y<<" "<<volume_size.z<<endl;
 name=argv[1];
 ofstream output(name.c_str(), ios::out | ios::binary);
 grad_name=name+".grad";
 ofstream grad_out(grad_name.c_str(), ios::out | ios::binary);
 	vec3i diff,curr,center;
-	center.x=size.x/2-1;
-	center.y=size.y/2-1;
-	center.z=size.z/2-1;
+	center.x=volume_size.x/2-1;
+	center.y=volume_size.y/2-1;
+	center.z=volume_size.z/2-1;
 
 
 if(mode=='c')
@@ -139,9 +139,9 @@ if(mode=='c')
 	char temp;
 	max_val=100;
 	sphere_data=new unsigned char[length];
-	for(z=0;z<size.z;z++)
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+	for(z=0;z<volume_size.z;z++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
 				curr=vec3i(x,y,z);
 				diff=curr-center;
@@ -179,7 +179,7 @@ if(mode=='t')
 	for(i=0;i<length;i++)
 	{
 		bubble_data[i].gradients=vec3usi(zero_val,zero_val,zero_val);
-		bubble_data[i].size=0;
+		bubble_data[i].volume_size=0;
 	}
 	memset(mask_data,0,sizeof(mask_data));    
 
@@ -192,21 +192,21 @@ if(mode=='t')
 	max_bubble_size=nr_balls;
 	//cout<<radius<<" "<<endl;
 	//make sure bubbles will fit entirely in the volume (center will be at radius distance from the edge
-	center.x=radius+rand_int(size.x-2*radius);
-	center.y=radius+rand_int(size.y-2*radius);
-	center.z=radius+rand_int(size.z-2*radius);
+	center.x=radius+rand_int(volume_size.x-2*radius);
+	center.y=radius+rand_int(volume_size.y-2*radius);
+	center.z=radius+rand_int(volume_size.z-2*radius);
 
 	if(!overwrite(center,radius))//if it will overwrite existing sphere try somewhere else
 		{
 		write_bubble(center,radius);
 		nr_bubbles++;
-		cout<<"bubble nr "<<nr_bubbles<<" of size "<<radius<<" written into volume.Trying to fit next bubble..."<<endl;
+		cout<<"bubble nr "<<nr_bubbles<<" of volume_size "<<radius<<" written into volume.Trying to fit next bubble..."<<endl;
 		next=true;
 		}
 	//if(nr_bubbles>=nr_balls)break;
 	if(kbhit())break;
 	}	
-	cout<<"writing volume of size "<<sizeof(tex_type)*length<<" to disc"<<endl;
+	cout<<"writing volume of volume_size "<<sizeof(tex_type)*length<<" to disc"<<endl;
 	output.write((char*)&bubble_data[0],sizeof(tex_type)*length);
 }
 max_val=32768-1;
@@ -220,9 +220,9 @@ if(mode=='m')
 	vec3si curr_grad;
 	multi_data=new vec3c[length];
 	gradients=new vec3si[length];
-	for(z=0;z<size.z;z++)
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+	for(z=0;z<volume_size.z;z++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
 				curr=vec3i(x,y,z);
 				diff=curr-center;
@@ -245,7 +245,7 @@ if(mode=='m')
 				write_multi_data(x,y,z,temp);
 				write_grad_data(x,y,z,curr_grad);
 				}
-	vec3i mini_size(size.x/nr_balls,size.y/nr_balls,size.z/nr_balls);
+	vec3i mini_size(volume_size.x/nr_balls,volume_size.y/nr_balls,volume_size.z/nr_balls);
 	max_dst/=nr_balls;
 	for(k=0;k<nr_balls;k++)
 		for(j=0;j<nr_balls;j++)
@@ -263,7 +263,7 @@ if(mode=='m')
 						distance=sqrt(pow(float(diff.x),2)+pow(float(diff.y),2)+pow(float(diff.z),2));
 						if(distance<max_dst)//&&distance>max_dst*0.6)
 						{
-							multi_data[x+y*size.x+z*(size.x*size.y)].y=unsigned char(255-255*distance/max_dst);
+							multi_data[x+y*volume_size.x+z*(volume_size.x*volume_size.y)].y=unsigned char(255-255*distance/max_dst);
 						}
 					}
 
@@ -283,9 +283,9 @@ if(mode=='s')
 	grad_float temp;
 	all_data=new grad_float[length];
 
-	for(z=0;z<size.z;z++)
-		for(y=0;y<size.y;y++)
-			for(x=0;x<size.x;x++)
+	for(z=0;z<volume_size.z;z++)
+		for(y=0;y<volume_size.y;y++)
+			for(x=0;x<volume_size.x;x++)
 				{
 				curr=vec3i(x,y,z);
 				diff=curr-center;
