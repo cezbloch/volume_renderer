@@ -70,6 +70,12 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\glut\lib;</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)program\*.glsl $(OutDir)
+copy $(SolutionDir)volumetric_data\t.bmp $(OutDir)
+copy $(SolutionDir)volumetric_data\tf.tga $(OutDir)
+copy $(SolutionDir)glut\bin\* $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -89,6 +95,12 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\glut\lib;</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>copy $(SolutionDir)program\*.glsl $(OutDir)
+copy $(SolutionDir)volumetric_data\t.bmp $(OutDir)
+copy $(SolutionDir)volumetric_data\tf.tga $(OutDir)
+copy $(SolutionDir)glut\bin\* $(OutDir)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\glew\src\glew.c">
